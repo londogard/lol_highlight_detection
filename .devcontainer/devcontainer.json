@@ -1,0 +1,28 @@
+{
+	"build": {
+		"dockerfile": "../Dockerfile"
+	},
+	"postCreateCommand": "conda init",
+	"postAttachCommand": "conda activate highlights",
+	"features": {
+		"ghcr.io/devcontainers/features/git": {},
+		"ghcr.io/devcontainers-contrib/features/apt-get-packages": {},
+		"ghcr.io/devcontainers-contrib/features/ffmpeg-apt-get:1": {},
+		"ghcr.io/devcontainers-contrib/features/rclone:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
+	},
+	"forwardPorts": [
+		8765
+	],
+	"customizations": {
+		// Configure properties specific to VS Code.
+		"vscode": {
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				"ms-python.python",
+				"ms-python.black-formatter"
+			]
+		}
+	}
+}

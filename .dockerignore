@@ -1,0 +1,9 @@
+converted/
+downloaded/
+lightning_logs/
+mlruns/
+tmp/
+highlights/
+out/
+Dockerfile
+env.yml
