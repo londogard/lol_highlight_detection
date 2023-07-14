@@ -162,3 +162,4 @@ cython_debug/
 frames/
 bauss.mkv
 .DS_Store
+*.mkv

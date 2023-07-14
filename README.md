@@ -9,6 +9,10 @@ League of Legend Highlight Detection
     - If > 5s is within time (is_highlight) - is_highlight
 4. Extract Frames into folders
 
+## TODOs
+
+- [ ] Set up Pre-Commit
+- [ ] Set up...
 
 ## Resources:
 
