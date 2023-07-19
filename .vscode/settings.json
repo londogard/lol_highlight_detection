@@ -2,5 +2,10 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter"
     },
-    "python.formatting.provider": "none"
+    "python.analysis.useImportHeuristic": true,
+    "python.formatting.provider": "none",
+    "cSpell.words": [
+        "keras",
+        "LSTM"
+    ]
 }
