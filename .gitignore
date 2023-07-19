@@ -164,3 +164,4 @@ bauss.mkv
 .DS_Store
 *.mkv
 models/
+lightning_logs
