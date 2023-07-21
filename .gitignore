@@ -165,3 +165,5 @@ bauss.mkv
 *.mkv
 models/
 lightning_logs
+*.keras
+*.ckpt
