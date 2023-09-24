@@ -167,3 +167,6 @@ models/
 lightning_logs
 *.keras
 *.ckpt
+
+**/*.jpg
+rclone.conf
