@@ -170,3 +170,5 @@ lightning_logs
 
 **/*.jpg
 rclone.conf
+
+quarto*

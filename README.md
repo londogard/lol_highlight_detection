@@ -1,14 +1,6 @@
 # lol_highlight_detection
 League of Legend Highlight Detection
 
-## Approach
-
-1. Downscale images to 480p to make sure size is OK
-2. Reduce to 5 FPS
-3. Extract Overlapping Videos (10s sequence, 5s overlap)
-    - If > 5s is within time (is_highlight) - is_highlight
-4. Extract Frames into folders
-
 ## TODOs
 
 - [ ] Set up Pre-Commit
