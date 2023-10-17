@@ -1,6 +1,6 @@
 from keras_core.models import Model
 from keras_core.layers import Input, LSTM, Dense, TimeDistributed, Flatten
-
+from keras_cv.models.backbones.resnet_v2 import resnet_v2_backbone
 
 class VideoClassifier:
     def __init__(self, num_classes):
@@ -8,7 +8,7 @@ class VideoClassifier:
 
         # Feature extraction layers
         self.video_input = Input(shape=(NUM_FRAMES, H, W, C))
-        self.cnn = ResNet50(
+        self.cnn = resnet_v2_backbone.ResNetV2Backbone(
             weights="imagenet", include_top=False, input_shape=(H, W, C)
         )
         self.cnn_features = TimeDistributed(cnn)(video_input)

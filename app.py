@@ -4,6 +4,7 @@ import solara.lab
 import ingest
 import r2
 import ipywidgets
+import inference
 
 
 @solara.component()
@@ -42,6 +43,8 @@ def DatasetR2():
 @solara.component()
 def Inference():
     file, set_file = solara.use_state(None)
+    running_inference, set_running = solara.use_state(False)
+
     with solara.Details("Upload Video"):
         solara.FileDrop(lazy=False, on_file=set_file)
         solara.Button("Convert")
@@ -53,10 +56,19 @@ def Inference():
         solara.Error("Make sure to upload/select file!")
     else:
         solara.Success("File Selected...")
-        solara.Button("Run Inference!")
+        solara.Button("Run Inference!", on_click=lambda: set_running(True))
+    if running_inference:
+        solara.Text("Running...")
+        solara.ProgressLinear(running_inference)
+        solara.display(ipywidgets.Video.from_file("1913327875.mkv"))
+        # df = inference.run_inference()
+        # import solara.express as px
 
-        # v = ipywidgets.Video.from_file()
+        # px.line(x=[1, 2, 3], y=[5, 6, 8])
+        # px.line(df, x="timestamp", y="preds", line_shape="hv")
 
+    # v = ipywidgets.Video.from_file()
+    ...
     pass
 
 

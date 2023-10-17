@@ -1,9 +1,9 @@
 import polars as pl
 
 
-def rebalance_labels(df: pl.DataFrame) -> pl.DataFrame:
+def balance_labels(df: pl.DataFrame, fraction: float = 0.5) -> pl.DataFrame:
     prev_num_labels = df["label"].sum()
-    to_remove = df.filter(pl.col("label") == 0).sample(fraction=0.7)
+    to_remove = df.filter(pl.col("label") == 0).sample(fraction=fraction)
     df = df.join(to_remove, on="path", how="anti")
 
     print(
