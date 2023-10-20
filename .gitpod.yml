@@ -1,11 +1,9 @@
 image: gitpod/workspace-python-3.11
 
-# Commands that will run on workspace start
 tasks:
-    - name: Setup, Install & Build
-      before: yarn global add express
-      init: yarn install
-      command: yarn build
+  - init: |
+      pip install -U lightning twitch-dl polars mlflow dagshub mlflow "pydantic<2.0.0" torch torchvision
+      sudo apt install rclone
 
 ports:
     - port: 3000
