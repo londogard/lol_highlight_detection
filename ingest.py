@@ -45,5 +45,5 @@ def vid_to_frames(TWITCH_ID: str, use_cuda: bool = True, frames: int = 3):
     ).communicate()
 
 # %%
-download_twitch_stream("1913327875", "00:05:00")
+# download_twitch_stream("1913327875", "00:05:00")
 # %%

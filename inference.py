@@ -9,12 +9,16 @@ import torch
 import torchvision.transforms as F
 
 
+def load_model(path:  Path) -> nn.Module:
+    return LightningWrapper(model=torch.load(path, map_location="cpu"), learning_rate=1e-3)
+
+
 def run_inference(
     model: nn.Module,
     image_folder: Path,
     aggregate_duration: int = 30,
     fps: int = 3,
-):
+) -> pl.DataFrame:
     trainer = L.Trainer()
     paths = list(image_folder.rglob("*.jpg"))
     transform = F.Compose([F.Resize((224, 224)), F.ToTensor()])
@@ -33,7 +37,7 @@ def run_inference(
     preds_class = np.repeat(pred_class.numpy(), ds.frames_per_clip)
     df = df.with_columns(preds=pl.Series(preds_class))
 
-    df["preds"].sum(), df["preds"].mean()
+    # df["preds"].sum(), df["preds"].mean()
 
     df_g = df.group_by(pl.col("frame") // (aggregate_duration * fps)).agg(
         pl.sum("preds")
@@ -47,7 +51,7 @@ def run_inference(
         .with_columns(timestamp=pl.time(pl.col("hour"), "minute", "second"))
         .sort("timestamp")
     )
-    print("% highlights", df_g["preds"].sum() / len(df_g))
+    # print("% highlights", df_g["preds"].sum() / len(df_g))
 
     # px.line(df_g, x="timestamp", y="preds", line_shape="hv")
 

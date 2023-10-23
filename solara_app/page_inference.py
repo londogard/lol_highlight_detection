@@ -15,6 +15,7 @@ def DownloadTwitch():
 def Inference():
     file, set_file = solara.use_state(None)
     running_inference, set_running = solara.use_state(False)
+    dwn_twitch, set_dwn = solara.use_state(False)
 
     with solara.Details("Select Video", expand=True):
         with solara.ColumnsResponsive():
@@ -26,7 +27,9 @@ def Inference():
                 solara.Markdown("## Download from Twitch")
                 twitch, set_twitch = solara.use_state("")
                 solara.InputText("Select Twitch ID", value=twitch, on_value=set_twitch)
-                solara.Button(f"Download {twitch}!")
+                solara.Button(f"Download {twitch}!", on_click=lambda: set_dwn(True))
+                if dwn_twitch:
+                    DownloadTwitch()
 
     if file is None:
         solara.Error("Make sure to upload/select file!")
