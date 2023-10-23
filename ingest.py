@@ -1,3 +1,4 @@
+
 import subprocess
 from pathlib import Path
 
@@ -42,3 +43,7 @@ def vid_to_frames(TWITCH_ID: str, use_cuda: bool = True, frames: int = 3):
             f"{TWITCH_ID}/img%d.jpg",
         ],
     ).communicate()
+
+# %%
+download_twitch_stream("1913327875", "00:05:00")
+# %%
