@@ -2,6 +2,10 @@ import solara
 import ingest
 import r2
 
+
+# elif file["name"].rsplit(".", 1)[1] not in SUPPORTED_FMTS:
+#        solara.Error(f"Invalid file type - only {SUPPORTED_FMTS} supported!")
+#        file = None
 @solara.component()
 def DownloadConvertPersist():
     twitch_id, set_twitch_id = solara.use_state("")

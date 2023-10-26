@@ -1,12 +1,13 @@
-
 import subprocess
 from pathlib import Path
 
 
 def download_twitch_stream(TWITCH_ID: str, end_time: str | None = None):
-    if Path(f"{TWITCH_ID}.mkv").exists():
+    if Path(f"{TWITCH_ID}.mp4").exists():
         print(f"Already downloaded {TWITCH_ID}")
         return
+    output_path = Path("converted")
+    output_path.mkdir(exist_ok=True)
 
     end_time = ["-e", end_time] if end_time is not None else []
     subprocess.Popen(
@@ -18,7 +19,7 @@ def download_twitch_stream(TWITCH_ID: str, end_time: str | None = None):
             "720p60",
             *end_time,
             "--output",
-            f"{TWITCH_ID}.mkv",
+            str(output_path / f"{TWITCH_ID}.mp4"),
         ],
     ).communicate()
 
@@ -35,7 +36,7 @@ def vid_to_frames(TWITCH_ID: str, use_cuda: bool = True, frames: int = 3):
             "ffmpeg",
             *use_cuda,
             "-i",
-            f"{TWITCH_ID}.mkv",
+            f"{TWITCH_ID}.mp4",
             "-vf",
             f"fps={frames}",
             "-q:v",
@@ -43,6 +44,7 @@ def vid_to_frames(TWITCH_ID: str, use_cuda: bool = True, frames: int = 3):
             f"{TWITCH_ID}/img%d.jpg",
         ],
     ).communicate()
+
 
 # %%
 # download_twitch_stream("1913327875", "00:05:00")

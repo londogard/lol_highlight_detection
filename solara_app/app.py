@@ -6,7 +6,7 @@ from solara_app.page_download import DownloadConvertPersist
 from solara_app.page_inference import Inference
 
 
-@solara.component()
+@solara.component
 def DatasetR2():
     twitch_id, set_twitch_id = solara.use_state("")
     is_downloading, set_downloading = solara.use_state(False)
@@ -15,7 +15,7 @@ def DatasetR2():
     solara.Button("Download all data from R2", color="green")
 
 
-@solara.component()
+@solara.component
 def Page():
     with solara.Sidebar():
         solara.Title("League of Legend Highlight Extractor")
@@ -29,5 +29,6 @@ def Page():
                 Inference()
             with solara.lab.Tab("Download, Convert and Persist Twitch Clips"):
                 DownloadConvertPersist()
+
 
 Page()

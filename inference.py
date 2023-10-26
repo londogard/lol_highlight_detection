@@ -4,17 +4,27 @@ from torch import nn
 from torch.utils.data import DataLoader
 import polars as pl
 import lightning as L
+from typing import List
 from data_utils.frame_dataset import FrameDataset
 import torch
 import torchvision.transforms as F
 
+from models.lightning_wrapper import LightningWrapper
+import solara
 
-def load_model(path:  Path) -> nn.Module:
-    return LightningWrapper(model=torch.load(path, map_location="cpu"), learning_rate=1e-3)
+
+@solara.memoize
+def load_model(path: Path) -> LightningWrapper:
+    return LightningWrapper(
+        model=torch.load(path, map_location="cpu"), learning_rate=1e-3
+    )
 
 
+@solara.memoize(
+    key=lambda model, image_folder, aggregate_duration, fps: (folder, dur, fps)
+)
 def run_inference(
-    model: nn.Module,
+    model: L.LightningModule,
     image_folder: Path,
     aggregate_duration: int = 30,
     fps: int = 3,
@@ -28,8 +38,8 @@ def run_inference(
     df = df.sort("frame")
     ds = FrameDataset(df, transform, 1, is_train=False)
     dls = DataLoader(ds, batch_size=32, num_workers=2, pin_memory=True)
-    preds = trainer.predict(model, dataloaders=dls)
-    preds = torch.cat(preds)
+    preds_list: List[torch.Tensor] = trainer.predict(model, dataloaders=dls)  # type: ignore
+    preds = torch.cat(preds_list)
 
     print(preds.shape)
     pred_class = torch.argmax(preds, dim=1)
