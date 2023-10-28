@@ -21,12 +21,12 @@ class FrameDataModule(L.LightningDataModule):
         self.pin_memory = pin_memory
         self.chunk_size_for_splitting = chunk_size_for_splitting
         split = chunk_splitter(
-            len(dataset), chunk_size=self.chunk_size_for_splitting, split=0.15
+            len(dataset), chunk_size=self.chunk_size_for_splitting, split=0.15  # type: ignore
         )
         val_indices = np.where(split)[0]
         train_indices = np.where(split == 0)[0]
-        self.ds_train = Subset(self.dataset, train_indices)
-        self.ds_val = Subset(self.dataset, val_indices)
+        self.ds_train = Subset(self.dataset, train_indices)  # type: ignore
+        self.ds_val = Subset(self.dataset, val_indices)  # type: ignore
 
     def train_dataloader(self):
         return DataLoader(

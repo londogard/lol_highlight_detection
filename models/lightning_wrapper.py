@@ -1,3 +1,4 @@
+import solara
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -8,9 +9,10 @@ import torchmetrics
 class LightningWrapper(L.LightningModule):
     def __init__(self, model: nn.Module, learning_rate=1e-3):
         super().__init__()
-        self.save_hyperparameters()
+        self.save_hyperparameters(ignore=["model"])
         self.model = model  # self.hparams["model"]: TODO use hparams
         self.lr = learning_rate
+        solara.Text(self.model)
         metrics = torchmetrics.MetricCollection(
             {
                 "accuracy": torchmetrics.Accuracy(

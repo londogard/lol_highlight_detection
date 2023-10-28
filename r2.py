@@ -2,8 +2,11 @@ from pathlib import Path
 import subprocess
 
 
-def compress(TWITCH_ID: str):
-    subprocess.Popen(["tar", "-clvf", f"{TWITCH_ID}.tar.lz4", TWITCH_ID]).communicate()
+def compress(TWITCH_ID: str) -> str:
+    file = f"{TWITCH_ID}.tar.lz4"
+    subprocess.Popen(["tar", "-clvf", file, TWITCH_ID]).communicate()
+
+    return file
 
 
 def upload(file: str, prefix: str = "frames/"):

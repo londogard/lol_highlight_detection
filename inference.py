@@ -13,22 +13,22 @@ from models.lightning_wrapper import LightningWrapper
 import solara
 
 
-@solara.memoize
 def load_model(path: Path) -> LightningWrapper:
-    return LightningWrapper(
-        model=torch.load(path, map_location="cpu"), learning_rate=1e-3
-    )
+    return LightningWrapper.load_from_checkpoint(path)
 
 
-@solara.memoize(
-    key=lambda model, image_folder, aggregate_duration, fps: (folder, dur, fps)
-)
+# @solara.memoize
+import streamlit as st
+
+
+@st.cache_data
 def run_inference(
-    model: L.LightningModule,
+    model_path: Path,
     image_folder: Path,
     aggregate_duration: int = 30,
     fps: int = 3,
 ) -> pl.DataFrame:
+    model = load_model(model_path)
     trainer = L.Trainer()
     paths = list(image_folder.rglob("*.jpg"))
     transform = F.Compose([F.Resize((224, 224)), F.ToTensor()])
