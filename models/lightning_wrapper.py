@@ -1,18 +1,19 @@
-import solara
+from typing import Callable
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import lightning as L
 import torchmetrics
-
+import timm
 
 class LightningWrapper(L.LightningModule):
-    def __init__(self, model: nn.Module, learning_rate=1e-3):
+    def __init__(self, timm_model: str, num_classes: int, learning_rate: float =1e-3):
         super().__init__()
-        self.save_hyperparameters(ignore=["model"])
-        self.model = model  # self.hparams["model"]: TODO use hparams
+        self.timm_model = timm_model  # self.hparams["model"]: TODO use hparams
         self.lr = learning_rate
-        solara.Text(self.model)
+        self.model = timm.create_model('mobilenetv3_large_100', pretrained=True, num_classes=num_classes)
+        self.save_hyperparameters(ignore=["model"])
+
         metrics = torchmetrics.MetricCollection(
             {
                 "accuracy": torchmetrics.Accuracy(

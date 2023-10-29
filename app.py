@@ -14,12 +14,11 @@ def sidebar():
 def main():
     sidebar()
     st.header("League of Legend Highlight Extractor")
-    inference, download_convert = st.tabs(
-        ["Inference", "Download, Convert and Persist Twitch Clips"]
-    )
-    with download_convert:
+    mode = st.selectbox("Select Mode", ["Inference", "Download, Convert and Persist Twitch Clips"])
+
+    if mode == "Download, Convert and Persist Twitch Clips":
         download_convert_persist()
-    with inference:
+    else:
         page_inference.inference_page()
 
 
