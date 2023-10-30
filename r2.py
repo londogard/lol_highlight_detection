@@ -17,12 +17,13 @@ def upload(file: str, prefix: str = "frames/"):
             "rclone.conf",
             "copy",
             file,
-            f"r2:lol-highlights-eu/{prefix}",
+            f"r2:lol-highlights-eu/{prefix}/",
         ]
     ).communicate()
 
 
 def download(file: str):
+    print("DOWNKLOAD")
     subprocess.Popen(
         [
             "rclone",

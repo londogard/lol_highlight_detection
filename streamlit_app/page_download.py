@@ -12,6 +12,4 @@ def download_convert_persist():
             ingest.download_twitch_stream(twitch_id)
             st.write("Converting...")
             ingest.vid_to_frames(twitch_id, use_cuda=False)
-            #st.write("Uploading...")
-            #r2.upload(twitch_id)
         st.success("Downloaded!")

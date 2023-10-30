@@ -172,3 +172,8 @@ lightning_logs
 rclone.conf
 
 quarto*
+highlights/*.mp4
+mlruns/
+downloaded/
+*.mp3
+*.mp4

@@ -1,8 +1,9 @@
 import gradio
 import gradio as gr
 
-def greet(name):
+def greet(name: str):
     return "Hello " + name + "!"
+
 with gradio.Blocks() as demo:
     a = gr.Dropdown(["Lol", "Hey!"])
     out = gr.Textbox()

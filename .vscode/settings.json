@@ -6,5 +6,6 @@
     "python.analysis.autoImportCompletions": true,
     "python.analysis.diagnosticSeverityOverrides": {
         "reportPrivateImportUsage": "none"
-    }
+    },
+    "python.formatting.provider": "none"
 }

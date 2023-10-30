@@ -6,12 +6,15 @@ import lightning as L
 import torchmetrics
 import timm
 
+
 class LightningWrapper(L.LightningModule):
-    def __init__(self, timm_model: str, num_classes: int, learning_rate: float =1e-3):
+    def __init__(self, timm_model: str, num_classes: int, learning_rate: float = 1e-3):
         super().__init__()
-        self.timm_model = timm_model  # self.hparams["model"]: TODO use hparams
+        self.timm_model = timm_model
         self.lr = learning_rate
-        self.model = timm.create_model('mobilenetv3_large_100', pretrained=True, num_classes=num_classes)
+        self.model = timm.create_model(
+            timm_model, pretrained=True, num_classes=num_classes
+        )
         self.save_hyperparameters(ignore=["model"])
 
         metrics = torchmetrics.MetricCollection(
@@ -21,6 +24,7 @@ class LightningWrapper(L.LightningModule):
                 )
             }
         )
+
         self.train_metrics = metrics.clone(prefix="train_")
         self.val_metrics = metrics.clone(prefix="val_")
 

@@ -6,6 +6,10 @@ League of Legend Highlight Detection
 - [ ] Set up Pre-Commit
 - [ ] Set up...
 
+## Presentation
+
+slides.google.com
+
 ## Resources:
 
 1. Fast.AI - https://docs.fast.ai/tutorial.image_sequence.html

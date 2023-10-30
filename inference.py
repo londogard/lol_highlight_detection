@@ -21,7 +21,8 @@ def load_model(path: Path) -> LightningWrapper:
 import streamlit as st
 
 
-@st.cache_data
+# @st.cache_data
+@solara.memoize
 def run_inference(
     model_path: Path,
     image_folder: Path,
@@ -35,7 +36,7 @@ def run_inference(
     df = pl.DataFrame(
         {"path": paths, "frame": [int(p.stem.removeprefix("img")) for p in paths]}
     )
-    df = df.sort("frame")
+    df = df.sort("frame")[: 60 * 60 * 3]
     ds = FrameDataset(df, transform, 1, is_train=False)
     dls = DataLoader(ds, batch_size=32, num_workers=2, pin_memory=True)
     preds_list: List[torch.Tensor] = trainer.predict(model, dataloaders=dls)  # type: ignore

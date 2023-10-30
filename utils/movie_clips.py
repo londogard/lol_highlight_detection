@@ -4,12 +4,18 @@ from moviepy.editor import VideoFileClip, concatenate_videoclips
 import streamlit as st
 
 
-def build_video(orig_vid: str | Path, timestamps: List[Dict[str, str]], out: Path) -> Path:
-    # timestamps = [{"start": "00:01:23", "end": "00:02:45"}]
+def get_vid_path(
+    orig_vid: str | Path, timestamps: List[Dict[str, str]], out: Path
+) -> Path:
     out.mkdir(parents=True, exist_ok=True)
     vid_name = Path(orig_vid).name
     out_path = out / (vid_name + f"_{hash(str(timestamps))}.mp4")
 
+    return out_path
+
+
+def build_video(orig_vid: str | Path, timestamps: List[Dict[str, str]], out_path: Path):
+    # timestamps = [{"start": "00:01:23", "end": "00:02:45"}]
     if out_path.exists():
         return out_path
 
