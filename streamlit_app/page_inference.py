@@ -15,7 +15,7 @@ def inference_page():
         )
         st.form_submit_button("Extract Highlights!")
 
-    df_out = inference.run_inference(
+    df_out = inference.st_run_inference(
         Path("ckpts/timm/tf_efficientnet_b3.aa_in1k.ckpt"),
         Path(selected_file),
         aggregate_duration=10,

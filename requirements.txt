@@ -1,0 +1,14 @@
+lightning
+polars
+mlflow
+pydantic<2.0.0
+solara
+pytorch
+torchvision
+moviepy
+plotly
+streamlit
+gradio
+timm
+dagshub
+twitch-dl
