@@ -2,7 +2,7 @@ lightning
 polars
 mlflow
 pydantic<2.0.0
-solara
+# solara
 pytorch
 torchvision
 moviepy
