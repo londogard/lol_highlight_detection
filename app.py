@@ -1,6 +1,5 @@
 from pathlib import Path
 import shutil
-from networkx import is_empty
 import streamlit as st
 import r2
 from streamlit_app import page_inference
@@ -15,14 +14,21 @@ def sidebar():
             open("rclone.conf", "w").write(r2_config)
 
 
+def download_if_missing():
+    Path("ckpts/timm").mkdir(exist_ok=True, parents=True)
+    if len(list(Path("ckpts/timm").glob("*"))) == 0:
+        with st.spinner("Download model"):
+            r2.download("models/ckpts/timm/tf_efficientnet_b3.aa_in1k.ckpt")
+            shutil.move("tf_efficientnet_b3.aa_in1k.ckpt", "ckpts/timm")
+
+
 def main():
     sidebar()
     st.header("League of Legend Highlight Extractor")
-    if len(list(Path("ckpts").glob("*"))) == 0:
-        with st.spinner():
-            r2.download("models/ckpts/timm/tf_efficientnet_b3.aa_in1k.ckpt")
-            shutil.move("tf_efficientnet_b3.aa_in1k.ckpt", "ckpts/timm")
-    mode = st.selectbox("Select Mode", ["Inference", "Download, Convert and Persist Twitch Clips"])
+    download_if_missing()
+    mode = st.selectbox(
+        "Select Mode", ["Inference", "Download, Convert and Persist Twitch Clips"]
+    )
 
     if mode == "Download, Convert and Persist Twitch Clips":
         download_convert_persist()

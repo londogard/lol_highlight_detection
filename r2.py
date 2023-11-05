@@ -23,7 +23,6 @@ def upload(file: str, prefix: str = "frames/"):
 
 
 def download(file: str):
-    print("DOWNKLOAD")
     subprocess.Popen(
         [
             "rclone",

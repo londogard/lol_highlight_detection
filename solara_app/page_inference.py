@@ -31,7 +31,7 @@ def Inference():
     if running_inference:
         solara.Text("Running...")
         solara.ProgressLinear(running_inference)
-        df_out = inference.run_inference.use_thread(
+        df_out = inference.solara_run_inference.use_thread(
             Path("ckpts/timm/tf_efficientnet_b3.aa_in1k.ckpt"),
             Path(file),
             aggregate_duration=10,

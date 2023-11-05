@@ -19,7 +19,7 @@ def download_twitch_stream(TWITCH_ID: str, end_time: str | None = None):
             "720p60",
             *end_time,
             "--output",
-             str(out_path),
+            str(out_path),
         ],
     ).communicate()
     return True
