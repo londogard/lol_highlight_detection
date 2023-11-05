@@ -13,10 +13,13 @@ def inference_page():
         selected_file = st.selectbox(
             "Select File", [str(p) for p in Path("converted").glob("*") if p.is_dir()]
         )
+        selected_model = st.selectbox(
+            "Select Model", [str(p) for p in Path("ckpts").rglob("*.ckpt")]
+        )
         st.form_submit_button("Extract Highlights!")
 
     df_out = inference.run_inference(
-        Path("ckpts/timm/tf_efficientnet_b3.aa_in1k.ckpt"),
+        Path(selected_model),
         Path(selected_file),
         aggregate_duration=10,
     )
@@ -52,7 +55,7 @@ def inference_page():
 
     higlight_vid = get_vid_path(
         f"{selected_file.replace('converted', 'downloaded')}.mp4",
-        new_data[7:15],
+        new_data,
         Path("highlights"),
     )
 
@@ -60,7 +63,7 @@ def inference_page():
         with st.spinner("Creating video..."):
             build_video(
                 f"{selected_file.replace('converted', 'downloaded')}.mp4",
-                new_data[7:15],
+                new_data,
                 higlight_vid,
             )
 
