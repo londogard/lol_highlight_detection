@@ -7,15 +7,6 @@ from solara_app.page_inference import Inference
 
 
 @solara.component
-def DatasetR2():
-    twitch_id, set_twitch_id = solara.use_state("")
-    is_downloading, set_downloading = solara.use_state(False)
-    status, set_status = solara.use_state("")
-
-    solara.Button("Download all data from R2", color="green")
-
-
-@solara.component
 def Page():
     with solara.AppLayout(sidebar_open=False):
         with solara.Sidebar():

@@ -28,6 +28,10 @@ class LightningWrapper(L.LightningModule):
         self.train_metrics = metrics.clone(prefix="train_")
         self.val_metrics = metrics.clone(prefix="val_")
 
+    def get_transforms(self, is_training: bool):
+        data_config = timm.data.resolve_model_data_config(self.timm_model)
+        return timm.data.create_transform(**data_config, is_training=is_training)
+
     def forward(self, x):
         return self.model(x)
 

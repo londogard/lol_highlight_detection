@@ -4,8 +4,6 @@ from torch.utils.data import Dataset
 from torchvision.datasets.folder import default_loader
 import polars as pl
 
-# TODO: swap into Augmentations
-
 
 class FrameDataset(Dataset):
     def __init__(

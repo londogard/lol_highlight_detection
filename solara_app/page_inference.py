@@ -2,19 +2,19 @@ import datetime
 from pathlib import Path
 import solara
 from ipywidgets import Video
-import inference
 
 import plotly.express as px
+from solara_app.infer import solara_run_inference
 
 from utils.movie_clips import build_video, get_vid_path
-
-SUPPORTED_FMTS = {"mp4", "avi", "mkv"}
 
 
 @solara.component()
 def Inference():
     files = [str(p) for p in Path("converted").glob("*") if p.is_dir()]
+    models = [str(p) for p in Path("ckpts").rglob("*.ckpt")]
     file, set_file = solara.use_state(files[0])
+    model, set_model = solara.use_state(models[0])
     running_inference, set_running = solara.use_state(False)
 
     with solara.Details("Select Video", expand=True):
@@ -24,6 +24,12 @@ def Inference():
             value=file,
             on_value=set_file,
         )
+        solara.Select(
+            "Select Model",
+            values=models,
+            value=model,
+            on_value=set_model,
+        )
         solara.Button(
             "Run Inference!", color="primary", on_click=lambda: set_running(True)
         )
@@ -31,21 +37,15 @@ def Inference():
     if running_inference:
         solara.Text("Running...")
         solara.ProgressLinear(running_inference)
-        df_out = inference.solara_run_inference.use_thread(
-            Path("ckpts/timm/tf_efficientnet_b3.aa_in1k.ckpt"),
+        df_out = solara_run_inference.use_thread(
+            Path(model),
             Path(file),
             aggregate_duration=10,
         )
         if df_out.state == solara.ResultState.FINISHED:
             df_out = df_out.value  # type: ignore
-            solara.FigurePlotly(
-                px.line(
-                    df_out.cast({"timestamp": str}),
-                    x="timestamp",
-                    y="preds",
-                    line_shape="hv",
-                )
-            )
+            row = solara.Row()
+
             cut_off, set_cutoff = solara.use_state(5)
             solara.SliderInt(
                 "Highlight Y-Cutoff",
@@ -54,6 +54,15 @@ def Inference():
                 max=df_out["preds"].max() + 1,
                 on_value=set_cutoff,
             )
+            with row:
+                fig = px.line(
+                    df_out.cast({"timestamp": str}),
+                    x="timestamp",
+                    y="preds",
+                    line_shape="hv",
+                )
+                fig.add_hline(y=cut_off, line_color="red")
+                solara.FigurePlotly(fig)
             import polars as pl
 
             df = df_out.filter(pl.col("preds") >= cut_off).select(
@@ -75,13 +84,13 @@ def Inference():
             file_name = f"{file.replace('converted', 'downloaded')}.mp4"
             higlight_vid = get_vid_path(
                 file_name,
-                new_data[7:15],
+                new_data,
                 Path("highlights"),
             )
             solara.Button(
                 "Create highlight Video",
                 color="primary",
-                on_click=lambda: build_video(file_name, new_data[7:15], higlight_vid),
+                on_click=lambda: build_video(file_name, new_data, higlight_vid),
             )
 
             if higlight_vid.exists():

@@ -7,6 +7,15 @@ import streamlit as st
 import polars as pl
 from utils.movie_clips import build_video, get_vid_path
 
+@st.cache_data
+def st_run_inference(
+    model_path: Path,
+    image_folder: Path,
+    aggregate_duration: int = 30,
+    fps: int = 3,
+) -> pl.DataFrame:
+    return inference.run_inference(model_path, image_folder, aggregate_duration, fps)
+
 
 def inference_page():
     with st.form("random"):
@@ -18,7 +27,7 @@ def inference_page():
         )
         st.form_submit_button("Extract Highlights!")
 
-    df_out = inference.run_inference(
+    df_out = st_run_inference(
         Path(selected_model),
         Path(selected_file),
         aggregate_duration=10,
