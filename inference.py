@@ -3,10 +3,8 @@ import numpy as np
 from torch.utils.data import DataLoader
 import polars as pl
 import lightning as L
-from typing import List
 from data_utils.frame_dataset import FrameDataset
 import torch
-import torchvision.transforms as F
 
 from models.lightning_wrapper import LightningWrapper
 
@@ -24,12 +22,12 @@ def run_inference(
     df = pl.DataFrame(
         {"path": paths, "frame": [int(p.stem.removeprefix("img")) for p in paths]}
     )
-    df = df.sort("frame")[: 60 * 60 * 3]
+    df = df.sort("frame")
 
     ds = FrameDataset(df, model.get_transforms(is_training=False), 1, is_train=False)
     dls = DataLoader(ds, batch_size=32, num_workers=2, pin_memory=True)
 
-    preds_list: List[torch.Tensor] = trainer.predict(model, dataloaders=dls)  # type: ignore
+    preds_list: list[torch.Tensor] = trainer.predict(model, dataloaders=dls)  # type: ignore
     preds = torch.cat(preds_list)
     pred_class = torch.argmax(preds, dim=1)
     preds_class = np.repeat(pred_class.numpy(), ds.frames_per_clip)

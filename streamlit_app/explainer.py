@@ -10,7 +10,9 @@ def explain(images):
     masker_blur = shap.maskers.Image("blur(128,128)", Xtr[0].shape)
 
     # create an explainer with model and image masker
-    explainer = shap.Explainer(predict, masker_blur, output_names=["Nothing", "Highlight"])
+    explainer = shap.Explainer(
+        predict, masker_blur, output_names=["Nothing", "Highlight"]
+    )
 
     # feed only one image
     # here we explain two images using 100 evaluations of the underlying model to estimate the SHAP values

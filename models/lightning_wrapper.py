@@ -13,7 +13,7 @@ class LightningWrapper(L.LightningModule):
         self.timm_model = timm_model
         self.lr = learning_rate
         self.model = timm.create_model(
-            "mobilenetv3_large_100", pretrained=True, num_classes=num_classes
+            self.timm_model, pretrained=True, num_classes=num_classes
         )
         self.save_hyperparameters(ignore=["model"])
 

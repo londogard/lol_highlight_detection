@@ -7,6 +7,7 @@ import streamlit as st
 import polars as pl
 from utils.movie_clips import build_video, get_vid_path
 
+
 @st.cache_data
 def st_run_inference(
     model_path: Path,
