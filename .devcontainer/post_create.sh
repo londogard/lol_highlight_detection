@@ -1,2 +1,2 @@
-micromamba create -f env.yml &&
+micromamba create -f env.yml -y &&
 pre-commit install

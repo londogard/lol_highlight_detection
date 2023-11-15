@@ -1,6 +1,6 @@
 {
 	"image": "mcr.microsoft.com/devcontainers/universal:2",
-
+	"postCreateCommand": "bash .devcontainer/post_create.sh",
 	"features": {
 		"ghcr.io/devcontainers-contrib/features/ffmpeg-apt-get:1": {},
 		"ghcr.io/devcontainers-contrib/features/rclone:1": {},
@@ -10,12 +10,12 @@
 	"customizations": {
 		// Configure properties specific to VS Code.
 		"vscode": {
-		  // Add the IDs of extensions you want installed when the container is created.
-		  "extensions": [
-			"ms-azuretools.vscode-docker",
-			"ms-python.python",
-			"ms-python.black-formatter",
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
+				"ms-azuretools.vscode-docker",
+				"ms-python.python",
+				"ms-python.black-formatter"
 			]
 		}
-	  }
+	}
 }
