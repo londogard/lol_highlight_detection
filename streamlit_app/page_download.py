@@ -19,6 +19,7 @@ def download_convert_persist():
                 st.write("Converting...")
                 ingest.vid_to_frames(twitch_id, use_cuda=False)
             st.success("Downloaded!")
+
     elif service == "Kick":
         kick_id = st.text_input("Enter Kick ID")
         name = st.text_input("Nickname of video")
@@ -32,18 +33,22 @@ def download_convert_persist():
             if st.button("Download"):
                 with st.spinner():
                     st.write("Downloading...")
-                    subprocess.Popen(
-                        [
-                            "ffmpeg",
-                            "-i",
-                            json_data,
-                            "-vcodec",
-                            "copy",
-                            "-acodec",
-                            "copy",
-                            f"downloaded/{name}.mp4",
-                        ]
-                    )
-                    st.write("Converting...")
-                    ingest.vid_to_frames(name, use_cuda=False)
+                    if not Path(f"converted/{name}").exists():
+                        subprocess.Popen(
+                            [
+                                "ffmpeg",
+                                "-i",
+                                json_data,
+                                "-vcodec",
+                                "copy",
+                                "-acodec",
+                                "copy",
+                                f"downloaded/{name}.mp4",
+                            ]
+                        )
+
+                        st.write("Converting...")
+                        ingest.vid_to_frames(name, use_cuda=False)
+                        Path(f"downloaded/{name}.mp4").unlink()
+
                 st.success("Downloaded!")
