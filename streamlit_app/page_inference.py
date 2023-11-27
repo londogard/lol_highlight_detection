@@ -5,6 +5,7 @@ import inference
 import plotly.express as px
 import streamlit as st
 import polars as pl
+from utils import time_slice
 from utils.movie_clips import build_video, get_vid_path
 
 
@@ -40,32 +41,22 @@ def inference_page():
         max_value=df_out["preds"].max() + 1,
     )
     with st.expander("Advanced Options"):
-        buffer = st.slider("Buffering", 0, 15, value=0, step=1)
+        st.write("Non available right now.")
 
     fig = px.line(df_out, x="timestamp", y="preds", line_shape="hv")
     fig.add_hline(cut_off, line_color="red", line_dash="dash")
     with chart_container:
         st.plotly_chart(fig)
 
-    df = df_out.filter(pl.col("preds") >= cut_off).select(
-        start=pl.col("timestamp"),
-        end=(
-            pl.date(2023, 1, 1).dt.combine(pl.col("timestamp"))
-            + datetime.timedelta(seconds=10)
-        ).dt.time(),
-    )
-
-    data = df.cast(pl.Utf8).to_dicts()
-    new_data = [data[0]]
-    for row in data[1:]:
-        if new_data[-1]["end"] == row["start"]:
-            new_data[-1]["end"] = row["end"]
-        else:
-            new_data.append(row)
+    df = time_slice.create_start_end_time(df_out, cut_off)
+    times_dict = time_slice.merge_overlaps_into_dict(df)
+    # event: datetime.time = st.select_slider(
+    #    "Validate event", options=[x["start"] for x in times_dict]
+    # )
 
     higlight_vid = get_vid_path(
         f"{selected_file.replace('converted', 'downloaded')}.mp4",
-        new_data,
+        times_dict,
         Path("highlights"),
     )
 
@@ -73,7 +64,7 @@ def inference_page():
         with st.spinner("Creating video..."):
             build_video(
                 f"{selected_file.replace('converted', 'downloaded')}.mp4",
-                new_data,
+                times_dict,
                 higlight_vid,
             )
 

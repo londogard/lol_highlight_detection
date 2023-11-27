@@ -23,4 +23,4 @@ def Page():
                     DownloadConvertPersist()
 
 
-Page()
+solara.AppLayout(Page())
