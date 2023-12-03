@@ -1,7 +1,6 @@
-import datetime
 import polars as pl
 
-SECONDS_10 = datetime.timedelta(seconds=10)
+SECONDS_10 = pl.duration(seconds=10)
 RANDOM_DATE = pl.date(2023, 1, 1).dt
 
 
@@ -13,6 +12,9 @@ def create_start_end_time(df: pl.DataFrame, cut_off: int):
 
 
 def merge_overlaps_into_dict(df: pl.DataFrame):
+    if len(df) == 0:
+        return []
+
     data = df.cast(pl.Utf8).to_dicts()
     new_data = [data[0]]
     for row in data[1:]:
