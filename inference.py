@@ -43,7 +43,16 @@ def run_inference(
         .with_columns(
             hour=seconds // (60 * 60), minute=(seconds // 60) % 60, second=seconds % 60
         )
-        .with_columns(timestamp=pl.time(pl.col("hour"), "minute", "second"))
+        .with_columns(
+            timestamp=pl.datetime(
+                year=2023,
+                month=12,
+                day=10,
+                hour=pl.col("hour"),
+                minute="minute",
+                second="second",
+            )
+        )
         .sort("timestamp")
     )
 

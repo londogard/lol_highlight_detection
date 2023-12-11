@@ -1,50 +1,51 @@
-import datetime
 from pathlib import Path
-from sre_constants import SUCCESS
 import time
-from typing import Optional
 import polars as pl
 import solara
 from ipywidgets import Video
 from moviepy.editor import VideoFileClip
 import plotly.express as px
-from solara_app.infer import convert_vid, solara_run_inference
+from solara_app import sol_utils
+from solara_app.infer import solara_run_inference
 from solara_app.mini_components.c_inference import write_video
 from solara_app.mini_components.simple import Progress
 from utils import time_slice
 
-from utils.movie_clips import build_video, get_vid_path
 
-MODELS = [str(p) for p in Path("ckpts").rglob("*.ckpt")]
+def update_df(
+    df: solara.Reactive[pl.DataFrame], selected_vid: int, left: int, right: int
+):
+    if_stmt = pl.when(pl.col("row_nr") == selected_vid)
+    print(df.value)
+    df.value = (
+        df.value.with_row_count()
+        .with_columns(
+            if_stmt.then((pl.col("start") - pl.duration(seconds=left))).otherwise(
+                pl.col("start")
+            ),
+            if_stmt.then((pl.col("end") + pl.duration(seconds=right))).otherwise(
+                pl.col("end")
+            ),
+        )
+        .drop("row_nr")
+    )
+    print(df.value)
 
 
 @solara.component()
 def Inference():
-    files = [str(p) for p in Path("converted").glob("*") if p.is_dir()]
-    file = solara.use_reactive(files[0])
-    model = solara.use_reactive(MODELS[0])
+    file = solara.use_reactive(sol_utils.FILES[0])
+    model = solara.use_reactive(sol_utils.MODELS[0])
     df, set_df = solara.use_state(None)
     clicked, set_clicked = solara.use_state(False)
     left = solara.use_reactive(0)
     right = solara.use_reactive(0)
     use_clip = solara.use_reactive(True)
 
-    with solara.Details("Select Video", expand=True):
-        solara.Select(
-            "Select File",
-            values=files,
-            value=file,
-        )
-        solara.Select(
-            "Select Model",
-            values=MODELS,
-            value=model,
-        )
-        solara.Button(
-            "Run Inference!",
-            color="primary",
-            on_click=lambda: set_clicked(True),
-        )
+    selected_vid = solara.use_reactive(0)
+    cut_off = solara.use_reactive(5)
+
+    sol_utils.ModelFileSelection(file, model, set_clicked)
     if clicked:
         set_df(
             solara_run_inference.use_thread(
@@ -62,51 +63,36 @@ def Inference():
         df_out: solara.Reactive[pl.DataFrame] = solara.use_reactive(df.value)
 
         with solara.Card(style={"justify-content": "center"}):
-            row = solara.Row()
-
-            cut_off = solara.use_reactive(5)
-            solara.SliderInt(
-                "Highlight Y-Cutoff",
-                cut_off,
-                min=df_out.value["preds"].min() + 1,
-                max=df_out.value["preds"].max(),
-                thumb_label="always",
-                tick_labels="end_points",
+            sol_utils.cut_off_chart(cut_off, df_out.use_value())
+            time_df = solara.use_reactive(
+                time_slice.create_start_end_time(df_out.use_value(), cut_off.value)
             )
-            with row:
-                fig = px.line(
-                    df_out.value.cast({"timestamp": str}),
-                    x="timestamp",
-                    y="preds",
-                    line_shape="hv",
-                )
-                fig.add_hline(y=cut_off.value, line_color="red")
-                solara.FigurePlotly(fig)
 
-            time_df = solara.reactive(
-                time_slice.create_start_end_time(df_out.value, cut_off.value)
-            )
-            time_dict = time_slice.merge_overlaps_into_dict(time_df.value)
+            time_dict = time_df.value.cast(pl.Time).cast(pl.Utf8).to_dicts()
             file_name = f"{file.value.replace('converted', 'downloaded')}.mp4"
 
             if len(time_dict) == 0:
                 solara.Warning("No Highlights available...")
                 return
 
-            selected_vid = solara.use_reactive(0)
             tstamp = time_dict[selected_vid.value]
+
             # use_thread
             vid_clip = VideoFileClip(file_name)
 
             Path("tmp").mkdir(exist_ok=True)
             clip = vid_clip.subclip(tstamp["start"], tstamp["end"])
-            res = write_video.use_thread(clip, selected_vid.value, Path(file_name).stem)
-
+            res = write_video.use_thread(
+                clip,
+                f"{tstamp['start']}, {tstamp['end']}",
+                selected_vid.value,
+                Path(file_name).stem,
+            )
+            print("Rendering...")
             if res.state == solara.ResultState.RUNNING:
                 Progress("Building Clip...")
             if res.state == solara.ResultState.FINISHED:
-                time.sleep(0.1)
-                vid = Video.from_file(f"tmp/{selected_vid.value}.mp4", width=500)
+                vid = Video.from_file(res.value, width=500)
                 with solara.Row(
                     style={
                         "justify-content": "center",
@@ -127,25 +113,8 @@ def Inference():
                     )
 
                 with solara.Column(style={"justify-content": "center"}):
-                    # solara.Checkbox(label="Include Clip?", value=use_clip)
                     solara.InputInt("Expand Leftwards", left)
                     solara.InputInt("Expand Rightwards", right)
-                    solara.display(time_df.value.dtypes)
-
-                    def update_df():
-                        if_stmt = pl.when(pl.col("row_nr") == selected_vid.value)
-                        time_df.value = (
-                            time_df.value.with_row_count()
-                            .with_columns(
-                                if_stmt.then(pl.col("start") - left.value).otherwise(
-                                    pl.col("start")
-                                ),
-                                if_stmt.then(pl.col("end") + left.value).otherwise(
-                                    pl.col("end")
-                                ),
-                            )
-                            .drop("row_nr")
-                        )
 
                     with solara.Row():
                         solara.Button(
@@ -154,7 +123,12 @@ def Inference():
                         solara.Button(
                             "Remake Video using new settings",
                             color="primary",
-                            on_click=update_df,
+                            on_click=lambda: update_df(
+                                time_df,
+                                selected_vid.use_value(),
+                                left.use_value(),
+                                right.use_value(),
+                            ),
                         )
 
                 solara.Markdown("---")
@@ -169,6 +143,7 @@ def Inference():
             # vid = Video.from_file(str("tmp/1.mp4"), format="video/mp4", width=500)
             # vid.set_state()
             # solara.display(vid)
+
             """higlight_vid = get_vid_path(
                 file_name,
                 time_dict,
