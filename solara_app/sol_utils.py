@@ -23,8 +23,9 @@ def persist_uploaded_file(
 def ModelFileSelection(
     file: solara.Reactive[str],
     model: solara.Reactive[str],
-    set_clicked,
+    clicked: solara.Reactive[bool],
 ):
+    _clicked = solara.use_reactive(clicked)
     with solara.Details("Select Video", expand=True):
         solara.Select(
             "Select File",
@@ -39,12 +40,12 @@ def ModelFileSelection(
         solara.Button(
             "Run Inference!",
             color="primary",
-            on_click=lambda: set_clicked(True),
+            on_click=lambda: _clicked.set(True),
         )
 
 
 @solara.component
-def cut_off_chart(cut_off: solara.Reactive[float], df: pl.DataFrame):
+def CutOffChartSelection(cut_off: solara.Reactive[float], df: pl.DataFrame):
     div = solara.Column()
 
     solara.SliderInt(

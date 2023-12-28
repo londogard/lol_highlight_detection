@@ -19,7 +19,7 @@ def create_start_end_time(df: pl.DataFrame, cut_off: int) -> pl.DataFrame:
         else:
             new_data.append(row)
 
-    return pl.DataFrame(new_data)
+    return pl.DataFrame(new_data).with_columns(active=pl.lit(True))
 
 
 def merge_overlaps_into_dict(df: pl.DataFrame):
