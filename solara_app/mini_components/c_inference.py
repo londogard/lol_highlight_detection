@@ -1,10 +1,16 @@
 from pathlib import Path
 import solara
+from moviepy.editor import VideoFileClip
 
 
-@solara.memoize(
-    key=lambda _, start_stop, id, file_name: f"{start_stop}_{id}_{file_name}"
-)
-def write_video(clip, start_stop: str, id: int, file_name: str) -> str:
-    clip.write_videofile(f"tmp/{file_name}_{start_stop}_{id}.mp4")
-    return f"tmp/{file_name}_{start_stop}_{id}.mp4"
+@solara.memoize
+def write_video(start: str, stop: str, id: int, file_name: str) -> str:
+    vid_clip = VideoFileClip(file_name)
+
+    tmp_dir = Path("tmp")
+    tmp_dir.mkdir(exist_ok=True, parents=True)
+    clip = vid_clip.subclip(start, stop)
+    file = f"tmp/{file_name}_{start}_{stop}_{id}.mp4"
+    clip.write_videofile(file)
+
+    return tmp_dir / file

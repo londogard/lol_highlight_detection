@@ -15,18 +15,18 @@ MODELS = [str(p) for p in Path("ckpts").rglob("*.ckpt")]
 
 @solara.component
 def DfSelector(df: pl.DataFrame, file: str):
-    df = solara.use_reactive(df)
-    cut_off = solara.use_reactive(5)
+    # df = solara.use_reactive(df)
+
     left = solara.use_reactive(0)
     right = solara.use_reactive(0)
     with solara.Card(style={"justify-content": "center"}):
-        sol_utils.CutOffChartSelection(cut_off, df.value)
+        cut_off = solara.use_reactive(5)
 
-        time_df = solara.use_reactive(
-            time_slice.create_start_end_time(df.value, cut_off.value)
-        )
+        sol_utils.CutOffChartSelection(cut_off, df)
+        print(cut_off)
+        time_df = time_slice.create_start_end_time(df, cut_off.value)
         print("Rendering...")
-        time_dict = time_df.value.cast(pl.Time).cast(pl.Utf8).to_dicts()
+        time_dict = time_df.cast(pl.Time).cast(pl.Utf8).to_dicts()
         file_name = f"{file.replace('converted', 'downloaded')}.mp4"
 
         if len(time_dict) == 0:
@@ -36,18 +36,14 @@ def DfSelector(df: pl.DataFrame, file: str):
         selected_vid, set_selected_vid = solara.use_state(0)
         tstamp = time_dict[selected_vid]
 
-        # use_thread
-        vid_clip = VideoFileClip(file_name)
-
-        Path("tmp").mkdir(exist_ok=True)
-        clip = vid_clip.subclip(tstamp["start"], tstamp["end"])
-
         res = write_video.use_thread(
-            clip,
-            f"{tstamp['start']}, {tstamp['end']}",
+            tstamp["start"],
+            tstamp["end"],
             selected_vid,
             Path(file_name).stem,
         )
+        return
+
         return
         print(res.value)
         if res.state == solara.ResultState.RUNNING:
@@ -114,23 +110,19 @@ def DfSelector(df: pl.DataFrame, file: str):
 
 @solara.component
 def DfPage(model: str, file: str):
-    df, set_df = solara.use_state(None)
-
-    set_df(
-        solara_run_inference.use_thread(
-            Path(model),
-            Path(file),
-            aggregate_duration=10,
-        )
+    df = solara_run_inference.use_thread(
+        Path(model),
+        Path(file),
+        aggregate_duration=10,
     )
     print("Rendering..")
+
     if df is None:
         solara.Markdown("Start running to get further.")
     elif df.state == solara.ResultState.RUNNING:
         Progress("Running...")
     elif df.state == solara.ResultState.FINISHED:
         DfSelector(df.value, file)
-    solara.Markdown("LOL")
 
 
 @solara.component()
@@ -139,7 +131,6 @@ def Inference():
     file = solara.use_reactive(files[0])
     model = solara.use_reactive(MODELS[0])
     clicked = solara.use_reactive(False)
-    use_clip = solara.use_reactive(True)
 
     sol_utils.ModelFileSelection(file, model, clicked)
     if clicked.value:
