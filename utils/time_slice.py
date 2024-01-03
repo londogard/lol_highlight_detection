@@ -1,10 +1,13 @@
+import datetime
 import polars as pl
 
 SECONDS_10 = pl.duration(seconds=10)
 RANDOM_DATE = pl.date(2023, 1, 1).dt
 
 
-def create_start_end_time(df: pl.DataFrame, cut_off: int) -> pl.DataFrame:
+def create_start_end_time(
+    df: pl.DataFrame, cut_off: int, forward: dict, backward: dict
+) -> pl.DataFrame:
     df = df.filter(pl.col("preds") >= cut_off).select(
         start=pl.col("timestamp"),
         end=pl.col("timestamp") + pl.duration(seconds=10),
@@ -18,7 +21,13 @@ def create_start_end_time(df: pl.DataFrame, cut_off: int) -> pl.DataFrame:
             new_data[-1]["end"] = row["end"]
         else:
             new_data.append(row)
-
+    new_data = [
+        {
+            "start": d["start"] - datetime.timedelta(seconds=backward.get(i, 0)),
+            "end": d["end"] + datetime.timedelta(seconds=forward.get(i, 0)),
+        }
+        for i, d in enumerate(new_data)
+    ]
     return pl.DataFrame(new_data).with_columns(active=pl.lit(True))
 
 
