@@ -20,7 +20,7 @@ def persist_uploaded_file(
 
 
 @solara.component
-def ModelFileSelection(
+def ModelFileSelectComponent(
     file: solara.Reactive[str],
     model: solara.Reactive[str],
     clicked: solara.Reactive[bool],

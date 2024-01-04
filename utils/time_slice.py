@@ -28,7 +28,7 @@ def create_start_end_time(
         }
         for i, d in enumerate(new_data)
     ]
-    return pl.DataFrame(new_data).with_columns(active=pl.lit(True))
+    return pl.DataFrame(new_data)
 
 
 def merge_overlaps_into_dict(df: pl.DataFrame):

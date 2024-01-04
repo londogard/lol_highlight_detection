@@ -1,13 +1,15 @@
 from pathlib import Path
 import solara
 import solara.lab
-from solara_app import sol_utils
+from solara_app import folders, sol_utils
 from solara_app.page_download import DownloadConvertPersist
 from solara_app.page_inference import Inference
 
 
 @solara.component
 def Page():
+    folders.create_default_folders()
+
     with solara.Sidebar():
         solara.Title("League of Legend Highlight Extractor")
         dump_file = sol_utils.persist_uploaded_file("rclone.conf")

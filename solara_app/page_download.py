@@ -1,4 +1,5 @@
 import solara
+import torch
 import ingest
 import r2
 
@@ -16,7 +17,7 @@ def DownloadConvertPersist():
         set_downloading(True)
         set_status("")
         ingest.download_twitch_stream(twitch_id, end_time="00:05:00")
-        ingest.vid_to_frames(twitch_id, use_cuda=False)
+        ingest.vid_to_frames(twitch_id, use_cuda=torch.cuda.is_available())
         r2.upload(twitch_id)
         set_status("Download completed")
         set_downloading(False)
