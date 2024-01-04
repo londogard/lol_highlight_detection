@@ -23,16 +23,35 @@ def upload(file: str, prefix: str = "frames/"):
 
 
 def download(file: str):
-    subprocess.Popen(
+    if not Path(file).exists():
+        Path(file).parent.mkdir(parents=True, exist_ok=True)
+        subprocess.Popen(
+            [
+                "rclone",
+                "--config",
+                "rclone.conf",
+                "copy",
+                f"r2:lol-highlights-eu/{file}",
+                ".",
+            ]
+        ).communicate()
+
+
+def list_files(directory: str) -> list[str]:
+    out, _ = subprocess.Popen(
         [
             "rclone",
             "--config",
             "rclone.conf",
-            "copy",
-            f"r2:lol-highlights-eu/{file}",
-            ".",
-        ]
+            "ls",
+            "--exclude",
+            "*.jpg",
+            f"r2:lol-highlights-eu/{directory}",
+        ],
+        stdout=subprocess.PIPE,
     ).communicate()
+    out = [x.strip().split(" ")[-1] for x in out.decode("utf-8").split("\n") if len(x)]
+    return out
 
 
 def decompress(file: str):
