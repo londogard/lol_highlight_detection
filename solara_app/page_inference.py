@@ -10,9 +10,6 @@ from solara_app.mini_components.simple import Progress, Video
 from utils import time_slice
 
 
-MODELS = [str(p) for p in Path("ckpts").rglob("*.ckpt")]
-
-
 def false() -> bool:
     return False
 
@@ -137,8 +134,15 @@ def ShowDfComponent(model: str, file: str):
 @solara.component()
 def Inference():
     files = [str(p) for p in Path("converted").glob("*") if p.is_dir()]
-    file = solara.use_reactive(files[0])
-    model = solara.use_reactive(MODELS[0])
+    models = [str(p) for p in Path("ckpts").rglob("*.ckpt")]
+    file = solara.use_reactive(files[0] if len(files) else None)
+    model = solara.use_reactive(models[0] if len(models) else None)
+
+    if model.value is None or file.value is None:
+        return solara.Markdown(
+            "**It's required to at least download one stream and have one model available!**"
+        )
+
     clicked = solara.use_reactive(False)
 
     sol_utils.ModelFileSelectComponent(file, model, clicked)

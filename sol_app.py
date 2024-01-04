@@ -18,7 +18,7 @@ def Page():
         solara.Error("Upload rclone.conf first!")
     else:
         with solara.lab.Tabs():
-            with solara.lab.Tab("Download, Convert and Persist Twitch Clips"):
-                DownloadConvertPersist()
             with solara.lab.Tab("Inference"):
                 Inference()
+            with solara.lab.Tab("Download, Convert and Persist Twitch Clips"):
+                DownloadConvertPersist()
