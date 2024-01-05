@@ -1,8 +1,8 @@
-from pathlib import Path
 import solara
 from moviepy.editor import VideoFileClip, concatenate_videoclips
-from moviepy.editor import ImageSequenceClip
 import torch
+
+CODEC = {"codec": "h264_nvenc"} if torch.cuda.is_available() else {}
 
 
 @solara.memoize(
@@ -23,12 +23,8 @@ def write_full_video(
 
     # Write the final concatenated movie to a file
     file = vid_clip.filename.replace("downloaded", "out")
-    kwargs = {}
 
-    if torch.cuda.is_available():
-        kwargs["codec"] = "h264_nvenc"
-
-    final_clip.write_videofile(file, **kwargs)
+    final_clip.write_videofile(file, **CODEC)
 
     return file
 
@@ -40,10 +36,6 @@ def write_video(start: str, stop: str, id: int, file_name: str) -> str:
     clip = vid_clip.subclip(start, stop)
     file = f"tmp/{file_name}_{start}_{stop}_{id}.mp4"
 
-    kwargs = {}
-    if torch.cuda.is_available():
-        kwargs["codec"] = "h264_nvenc"
-
-    clip.write_videofile(file, **kwargs)
+    clip.write_videofile(file, **CODEC)
 
     return file

@@ -8,16 +8,22 @@ from solara_app.page_inference import Inference
 
 
 @solara.component
-def Page():
-    folders.create_default_folders()
-    models = r2.list_files("models")
-    for m in models:
-        r2.download(m)
-
+def SidebarUpload():
     with solara.Sidebar():
         solara.Title("League of Legend Highlight Extractor")
         dump_file = sol_utils.persist_uploaded_file("rclone.conf")
         solara.FileDrop(label="Drop R2 Config", lazy=False, on_file=dump_file)
+
+
+@solara.component
+def Page():
+    folders.create_default_folders()
+    models = r2.list_files("models")
+    for m in models:
+        r2.download(m, out_folder="ckpts")
+
+    SidebarUpload()
+
     if not Path("rclone.conf").exists():
         solara.Error("Upload rclone.conf first!")
     else:

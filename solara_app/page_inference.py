@@ -124,7 +124,6 @@ def ShowDfComponent(model: str, file: str):
         Path(file),
         aggregate_duration=10,
     )
-    print(df)
 
     if df.state == solara.ResultState.RUNNING:
         Progress("Running...")

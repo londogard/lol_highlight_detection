@@ -5,7 +5,7 @@ TMP = Path("tmp")
 OUT = Path("out")
 DOWNLOADED = Path("downloaded")
 CONVERTED = Path("converted")
-CHECKPOINTS = Path("checkpoints")
+CHECKPOINTS = Path("ckpts")
 _ALL_PATHS = [TMP, OUT, DOWNLOADED, CONVERTED, CHECKPOINTS]
 
 
