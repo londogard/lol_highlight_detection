@@ -15,6 +15,7 @@ def DownloadConvertPersist():
         set_downloading(True)
         set_status("")
         ingest.download_twitch_stream(twitch_id.value, end_time=end_time.value)
+        set_status("Converting to frames...")
         ingest.vid_to_frames(twitch_id.value, use_cuda=torch.cuda.is_available())
 
         set_status("Download completed")

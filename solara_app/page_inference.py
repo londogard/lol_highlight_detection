@@ -4,6 +4,7 @@ import solara
 
 from solara_app import sol_utils
 from solara_app.css import ALIGN_CENTER, JUSTIFY_CENTER
+from solara_app.folders import CHECKPOINTS, CONVERTED
 from solara_app.infer import solara_run_inference
 from solara_app.mini_components.c_inference import write_full_video, write_video
 from solara_app.mini_components.simple import Progress, Video
@@ -133,8 +134,8 @@ def ShowDfComponent(model: str, file: str):
 
 @solara.component()
 def Inference():
-    files = [str(p) for p in Path("converted").glob("*") if p.is_dir()]
-    models = [str(p) for p in Path("ckpts").rglob("*.ckpt")]
+    files = [str(p) for p in CONVERTED.glob("*") if p.is_dir()]
+    models = [str(p) for p in CHECKPOINTS.rglob("*.ckpt")]
     file = solara.use_reactive(files[0] if len(files) else None)
     model = solara.use_reactive(models[0] if len(models) else None)
 

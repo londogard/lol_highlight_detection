@@ -5,6 +5,8 @@ import solara
 import polars as pl
 import plotly.express as px
 
+from solara_app.folders import CHECKPOINTS, CONVERTED
+
 FILES = [str(p) for p in Path("converted").glob("*") if p.is_dir()]
 MODELS = [str(p) for p in Path("ckpts").rglob("*.ckpt")]
 
@@ -25,16 +27,18 @@ def ModelFileSelectComponent(
     model: solara.Reactive[str],
     clicked: solara.Reactive[bool],
 ):
+    files = [str(p) for p in CONVERTED.glob("*") if p.is_dir()]
+    models = [str(p) for p in CHECKPOINTS.rglob("*.ckpt")]
     _clicked = solara.use_reactive(clicked)
     with solara.Details("Select Video", expand=True):
         solara.Select(
             "Select File",
-            values=FILES,
+            values=files,
             value=file,
         )
         solara.Select(
             "Select Model",
-            values=MODELS,
+            values=models,
             value=model,
         )
         solara.Button(
