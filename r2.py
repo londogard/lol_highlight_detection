@@ -22,9 +22,8 @@ def upload(file: str, prefix: str = "frames/"):
     ).communicate()
 
 
-def download(file: str):
+def download(file: str, out_folder: str = "."):
     if not Path(file).exists():
-        Path(file).parent.mkdir(parents=True, exist_ok=True)
         subprocess.Popen(
             [
                 "rclone",
@@ -32,7 +31,7 @@ def download(file: str):
                 "rclone.conf",
                 "copy",
                 f"r2:lol-highlights-eu/{file}",
-                ".",
+                out_folder,
             ]
         ).communicate()
 
