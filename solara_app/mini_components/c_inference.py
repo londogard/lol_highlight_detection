@@ -24,7 +24,7 @@ def write_full_video(
     # Write the final concatenated movie to a file
     file = vid_clip.filename.replace("downloaded", "out")
 
-    final_clip.write_videofile(file, **CODEC)
+    final_clip.write_videofile(file)
 
     return file
 
@@ -36,6 +36,6 @@ def write_video(start: str, stop: str, id: int, file_name: str) -> str:
     clip = vid_clip.subclip(start, stop)
     file = f"tmp/{file_name}_{start}_{stop}_{id}.mp4"
 
-    clip.write_videofile(file, **CODEC)
+    clip.write_videofile(file)
 
     return file
