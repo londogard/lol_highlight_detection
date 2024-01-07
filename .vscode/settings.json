@@ -2,10 +2,10 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter"
     },
-    "python.analysis.useImportHeuristic": true,
-    "python.formatting.provider": "black",
-    "cSpell.words": [
-        "keras",
-        "LSTM"
-    ]
+    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportPrivateImportUsage": "none"
+    },
+    "python.formatting.provider": "none"
 }

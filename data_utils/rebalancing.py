@@ -1,13 +1,13 @@
 import polars as pl
 
 
-def rebalance_labels(df: pl.DataFrame) -> pl.DataFrame:
-    prev_num_labels = df["label"].sum()
-    to_remove = df.filter(pl.col("label") == 0).sample(fraction=0.7)
+def balance_labels(df: pl.DataFrame, fraction: float = 0.5) -> pl.DataFrame:
+    prev_num_labels, prev_total = df["label"].sum(), len(df)
+    to_remove = df.filter(pl.col("label") == 0).sample(fraction=fraction)
     df = df.join(to_remove, on="path", how="anti")
 
     print(
-        f"Previously {prev_num_labels / len(df):.1%} highlights, now {df['label'].sum() / len(df):.1%}"
+        f"Previously {prev_num_labels / prev_total:.1%} highlights, now {df['label'].sum() / len(df):.1%}"
     )
 
     return df

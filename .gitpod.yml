@@ -1,0 +1,12 @@
+image: gitpod/workspace-python-3.11
+
+tasks:
+  - init: |
+      pip install -U lightning twitch-dl polars mlflow dagshub mlflow "pydantic<2.0.0" torch torchvision
+      sudo apt install rclone
+
+ports:
+    - port: 3000
+      onOpen: open-preview
+      name: Website
+      description: Website Preview

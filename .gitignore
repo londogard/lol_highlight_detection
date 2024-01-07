@@ -163,10 +163,18 @@ frames/
 bauss.mkv
 .DS_Store
 *.mkv
-models/
+
 lightning_logs
 *.keras
 *.ckpt
 
 **/*.jpg
 rclone.conf
+
+quarto*
+highlights/*.mp4
+mlruns/
+downloaded/
+*.mp3
+*.mp4
+llamafile-server-0.1-llava-v1.5-7b-q4
