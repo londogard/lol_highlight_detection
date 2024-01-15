@@ -1,12 +1,19 @@
 {
-	"image": "mcr.microsoft.com/devcontainers/universal:2",
-	"postCreateCommand": "bash .devcontainer/post_create.sh",
+	"build": {
+		"dockerfile": "../Dockerfile"
+	},
+	"postCreateCommand": "conda init",
+	"postAttachCommand": "conda activate highlights",
 	"features": {
+		"ghcr.io/devcontainers/features/git": {},
+		"ghcr.io/devcontainers-contrib/features/apt-get-packages": {},
 		"ghcr.io/devcontainers-contrib/features/ffmpeg-apt-get:1": {},
 		"ghcr.io/devcontainers-contrib/features/rclone:1": {},
-		"ghcr.io/mamba-org/devcontainer-features/micromamba:1": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {}
 	},
+	"forwardPorts": [
+		8765
+	],
 	"customizations": {
 		// Configure properties specific to VS Code.
 		"vscode": {

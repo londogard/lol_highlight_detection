@@ -2,10 +2,15 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter"
     },
-    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.typeCheckingMode": "basic",
     "python.analysis.autoImportCompletions": true,
+    "python.analysis.packageIndexDepths": [
+        {
+            "name": "",
+            "depth": 5
+        }
+    ],
     "python.analysis.diagnosticSeverityOverrides": {
         "reportPrivateImportUsage": "none"
     },
-    "python.formatting.provider": "none"
 }

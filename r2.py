@@ -24,16 +24,19 @@ def upload(file: str, prefix: str = "frames/"):
 
 def download(file: str, out_folder: str = "."):
     if not Path(file).exists():
-        subprocess.Popen(
-            [
-                "rclone",
-                "--config",
-                "rclone.conf",
-                "copy",
-                f"r2:lol-highlights-eu/{file}",
-                out_folder,
-            ]
-        ).communicate()
+        print(
+            subprocess.Popen(
+                [
+                    "rclone",
+                    "--config",
+                    "rclone.conf",
+                    "copy",
+                    f"r2:lol-highlights-eu/{file}",
+                    out_folder,
+                ]
+            ).communicate()
+        )
+        return file
 
 
 def list_files(directory: str) -> list[str]:

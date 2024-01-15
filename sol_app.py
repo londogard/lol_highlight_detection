@@ -1,11 +1,11 @@
 from pathlib import Path
 import solara
 import solara.lab
-import r2
 from solara_app import folders, sol_utils
 from solara_app.mini_components.simple import Progress
 from solara_app.page_download import DownloadConvertPersist
 from solara_app.page_inference import Inference
+from solara_app.page_models import DownloadModels
 
 PROMPT = """<|system|>
                     You are a chatbot who help write successful titles for Youtube videos of League of Legends Highlights from TheBaus that are generated using AI!</s>
@@ -25,15 +25,6 @@ def SidebarUpload():
 @solara.component
 def Page():
     folders.create_default_folders()
-    import requests
-
-    # Check if there is a network connection available
-    req = requests.get("https://google.com", timeout=2)
-    # if req.status_code == 200:
-    #    models = solara.use_thread(lambda: r2.list_files("models"))
-    #    if models.state == solara.ResultState.FINISHED:
-    #        for m in models.value:
-    #            solara.use_thread(lambda: r2.download(m, out_folder="ckpts"))
 
     SidebarUpload()
 
@@ -45,6 +36,8 @@ def Page():
                 Inference()
             with solara.lab.Tab("Download, Convert and Persist Twitch Clips"):
                 DownloadConvertPersist()
+            with solara.lab.Tab("Download Model(s)"):
+                DownloadModels()
             with solara.lab.Tab("Generate Video Title"):
                 solara.Markdown(
                     """
@@ -78,5 +71,5 @@ def Page():
                     if res.state == solara.ResultState.RUNNING:
                         Progress("Running...")
                 if title.value:
-                    solara.Markdown(f"Title:")
+                    solara.Markdown("Title:")
                     solara.Text(title.value)
