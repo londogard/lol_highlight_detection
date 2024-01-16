@@ -1,10 +1,10 @@
 # lol_highlight_detection
 League of Legend Highlight Detection
 
-## TODOs
+## Running project
 
-- [ ] Set up Pre-Commit
-- [ ] Set up...
+1. Use `devcontainer`, should be automatic
+2. Use `conda`/`mamba` and install `env.yml`, simple enough!
 
 ## Presentation
 

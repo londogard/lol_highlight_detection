@@ -5,3 +5,5 @@ mlruns/
 tmp/
 highlights/
 out/
+Dockerfile
+env.yml
