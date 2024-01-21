@@ -24,7 +24,10 @@ def DfSelectComponent(df: pl.DataFrame, file: str):
     cut_off = solara.use_reactive(5)
     clicks, set_clicks = solara.use_state(0)
 
-    with solara.Card(style=JUSTIFY_CENTER):
+    with solara.Card(
+        "Highlight Selection & Editing",
+        "Select highlight threshold, remove or expand clips",
+    ):
         sol_utils.CutOffChartSelection(cut_off, df)
 
         time_df = time_slice.create_start_end_time(
@@ -95,27 +98,26 @@ def DfSelectComponent(df: pl.DataFrame, file: str):
                     style={"width": "25%"},
                 )
 
-            solara.Markdown("---")
+    with solara.Card("Full Video", "Build the full video!"):
+        solara.Button(
+            "Build Full Video",
+            color="primary",
+            on_click=lambda: set_clicks(clicks + 1),
+        )
 
-            solara.Button(
-                "Build Full Video",
-                color="primary",
-                on_click=lambda: set_clicks(clicks + 1),
+        if clicks > 0:
+            res_full = write_full_video.use_thread(
+                time_dict.value,
+                disabled.value,
+                Path(file_name).stem,
+                str(time_dict),
             )
-
-            if clicks > 0:
-                res_full = write_full_video.use_thread(
-                    time_dict.value,
-                    disabled.value,
-                    Path(file_name).stem,
-                    str(time_dict),
+            if res_full.state == solara.ResultState.RUNNING:
+                Progress("Building Full Clip...")
+            elif res_full.state == solara.ResultState.FINISHED:
+                solara.FileDownload(
+                    lambda: open(res_full.value, "rb"), Path(res_full.value).name
                 )
-                if res_full.state == solara.ResultState.RUNNING:
-                    Progress("Building Full Clip...")
-                elif res_full.state == solara.ResultState.FINISHED:
-                    solara.FileDownload(
-                        lambda: open(res_full.value, "rb"), Path(res_full.value).name
-                    )
 
 
 @solara.component

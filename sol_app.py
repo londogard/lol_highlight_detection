@@ -15,61 +15,73 @@ PROMPT = """<|system|>
 
 
 @solara.component
-def SidebarUpload():
+def SidebarUpload(selected_page: solara.Reactive[str]):
     with solara.Sidebar():
         solara.Title("League of Legend Highlight Extractor")
-        dump_file = sol_utils.persist_uploaded_file("rclone.conf")
-        solara.FileDrop(label="Drop R2 Config", lazy=False, on_file=dump_file)
+        if Path("rclone.conf").exists():
+            solara.Success("rclone.conf uploaded.")
+        else:
+            dump_file = sol_utils.persist_uploaded_file("rclone.conf")
+            solara.FileDrop(label="Drop R2 Config", lazy=False, on_file=dump_file)
+            solara.Error("Upload rclone.conf first!")
+        solara.Select(
+            "Select Page",
+            [
+                "Inference",
+                "Download, Convert and Persist Twitch Clips",
+                "Download Model(s)",
+                "Generate Video Title",
+            ],
+            value=selected_page,
+        )
 
 
 @solara.component
 def Page():
     folders.create_default_folders()
 
-    SidebarUpload()
+    selected_page = solara.use_reactive("Inference")
+    SidebarUpload(selected_page)
 
     if not Path("rclone.conf").exists():
         solara.Error("Upload rclone.conf first!")
     else:
-        with solara.lab.Tabs():
-            with solara.lab.Tab("Inference"):
-                Inference()
-            with solara.lab.Tab("Download, Convert and Persist Twitch Clips"):
-                DownloadConvertPersist()
-            with solara.lab.Tab("Download Model(s)"):
-                DownloadModels()
-            with solara.lab.Tab("Generate Video Title"):
-                solara.Markdown(
-                    """
+        if selected_page.value == "Inference":
+            Inference()
+        elif selected_page.value == "Download, Convert and Persist Twitch Clips":
+            DownloadConvertPersist()
+        elif selected_page.value == "Download Model(s)":
+            DownloadModels()
+        elif selected_page.value == "Generate Video Title":
+            solara.Markdown(
+                """
                     ## Title Generator
 
                     Generate a title using a Large Language Model (**LLM**).
                     """
+            )
+            solara.InputText(
+                "What should title be based on?",
+                "TheBaus is a famous streamer who usually plays Sion, this highlight sections show-cases both (good) deaths and wins!",
+            )
+            from transformers import pipeline
+
+            title = solara.use_reactive(None)
+            clicks = solara.use_reactive(0)
+
+            def gen_title():
+                pipe = pipeline(
+                    "text-generation", model="TinyLlama/TinyLlama-1.1B-Chat-v1.0"
                 )
-                solara.InputText(
-                    "What should title be based on?",
-                    "TheBaus is a famous streamer who usually plays Sion, this highlight sections show-cases both (good) deaths and wins!",
-                )
-                from transformers import pipeline
+                out = pipe(PROMPT)
+                title.value = out[0]["generated_text"].replace(PROMPT, "")
 
-                title = solara.use_reactive(None)
-                clicks = solara.use_reactive(0)
+            solara.Button("Generate!", on_click=lambda: clicks.set(clicks.value + 1))
 
-                def gen_title():
-                    pipe = pipeline(
-                        "text-generation", model="TinyLlama/TinyLlama-1.1B-Chat-v1.0"
-                    )
-                    out = pipe(PROMPT)
-                    title.value = out[0]["generated_text"].replace(PROMPT, "")
-
-                solara.Button(
-                    "Generate!", on_click=lambda: clicks.set(clicks.value + 1)
-                )
-
-                if clicks.value > 0:
-                    res = solara.use_thread(gen_title)
-                    if res.state == solara.ResultState.RUNNING:
-                        Progress("Running...")
-                if title.value:
-                    solara.Markdown("Title:")
-                    solara.Text(title.value)
+            if clicks.value > 0:
+                res = solara.use_thread(gen_title)
+                if res.state == solara.ResultState.RUNNING:
+                    Progress("Running...")
+            if title.value:
+                solara.Markdown("Title:")
+                solara.Text(title.value)

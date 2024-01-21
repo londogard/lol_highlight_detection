@@ -5,6 +5,7 @@ League of Legend Highlight Detection
 
 1. Use `devcontainer`, should be automatic
 2. Use `conda`/`mamba` and install `env.yml`, simple enough!
+3. `solara run sol_app.py`
 
 ## Presentation
 

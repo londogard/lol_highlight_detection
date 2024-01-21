@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Callable
 from solara.components.file_drop import FileInfo
 import solara
@@ -6,9 +5,6 @@ import polars as pl
 import plotly.express as px
 
 from solara_app.folders import CHECKPOINTS, CONVERTED
-
-FILES = [str(p) for p in Path("converted").glob("*") if p.is_dir()]
-MODELS = [str(p) for p in Path("ckpts").rglob("*.ckpt")]
 
 
 def persist_uploaded_file(
