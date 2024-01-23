@@ -26,17 +26,18 @@ def ModelFileSelectComponent(
     files = [str(p) for p in CONVERTED.glob("*") if p.is_dir()]
     models = [str(p) for p in CHECKPOINTS.rglob("*.ckpt")]
     _clicked = solara.use_reactive(clicked)
-    with solara.Details("Select Video", expand=True):
-        solara.Select(
-            "Select File",
-            values=files,
-            value=file,
-        )
-        solara.Select(
-            "Select Model",
-            values=models,
-            value=model,
-        )
+    with solara.Card("Select Video/Model"):
+        with solara.Columns():
+            solara.Select(
+                "Select File",
+                values=files,
+                value=file,
+            )
+            solara.Select(
+                "Select Model",
+                values=models,
+                value=model,
+            )
         solara.Button(
             "Run Inference!",
             color="primary",
