@@ -47,6 +47,7 @@ def ModelFileSelectComponent(
 
 @solara.component
 def CutOffChartSelection(cut_off: solara.Reactive[float], df: pl.DataFrame):
+    x_axis = solara.reactive([df["timestamp"].min(), df["timestamp"].max()])
     div = solara.Column()
 
     solara.SliderInt(
@@ -59,10 +60,27 @@ def CutOffChartSelection(cut_off: solara.Reactive[float], df: pl.DataFrame):
     )
     with div:
         fig = px.line(
-            df.cast({"timestamp": str}),
-            x="timestamp",
-            y="preds",
-            line_shape="hv",
+            df, x="timestamp", y="preds", line_shape="hv", range_x=x_axis.value
         )
         fig.add_hline(y=cut_off.value, line_color="red")
-        solara.FigurePlotly(fig)
+
+        def update_vals(dict):
+            from dateutil import parser
+
+            if dict is not None:
+                print(dict)
+                layout = dict["relayout_data"]
+                if "xaxis.range[0]" in layout:
+                    x_axis.value = [
+                        parser.parse(
+                            dict["relayout_data"]["xaxis.range[0]"], ignoretz=True
+                        ),
+                        parser.parse(
+                            dict["relayout_data"]["xaxis.range[1]"], ignoretz=True
+                        ),
+                    ]
+                else:
+                    print(x_axis.value)
+
+        print(x_axis.value)
+        solara.FigurePlotly(fig, on_relayout=update_vals)

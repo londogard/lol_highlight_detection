@@ -7,7 +7,7 @@ from solara_app.css import ALIGN_CENTER, JUSTIFY_CENTER
 from solara_app.folders import CHECKPOINTS, CONVERTED
 from solara_app.infer import solara_run_inference
 from solara_app.mini_components.c_inference import write_full_video, write_video
-from solara_app.mini_components.simple import Progress, Video
+from solara_app.mini_components.simple import Progress, ProgressDynamic, Video
 from utils import time_slice
 
 
@@ -43,7 +43,6 @@ def DfSelectComponent(df: pl.DataFrame, file: str):
             return
 
         tstamp = time_dict.value[selected_vid]
-
         res = write_video.use_thread(
             tstamp["start"],
             tstamp["end"],
@@ -51,10 +50,10 @@ def DfSelectComponent(df: pl.DataFrame, file: str):
             Path(file_name).stem,
         )
 
-        if res.state == solara.ResultState.RUNNING:
-            Progress("Building Clip...")
-        elif res.state == solara.ResultState.FINISHED:
-            # TODO: extract into component.
+        ProgressDynamic("Building Clip...", res)
+
+        # TODO: extract into component.
+        if res.state == solara.ResultState.FINISHED:
             with solara.Row(style={**JUSTIFY_CENTER, **ALIGN_CENTER}):
                 solara.Button(
                     "<",
@@ -98,26 +97,26 @@ def DfSelectComponent(df: pl.DataFrame, file: str):
                     style={"width": "25%"},
                 )
 
-    with solara.Card("Full Video", "Build the full video!"):
-        solara.Button(
-            "Build Full Video",
-            color="primary",
-            on_click=lambda: set_clicks(clicks + 1),
-        )
-
-        if clicks > 0:
-            res_full = write_full_video.use_thread(
-                time_dict.value,
-                disabled.value,
-                Path(file_name).stem,
-                str(time_dict),
+        with solara.Card("Full Video", "Build the full video!"):
+            solara.Button(
+                "Build Full Video",
+                color="primary",
+                on_click=lambda: set_clicks(clicks + 1),
             )
-            if res_full.state == solara.ResultState.RUNNING:
-                Progress("Building Full Clip...")
-            elif res_full.state == solara.ResultState.FINISHED:
-                solara.FileDownload(
-                    lambda: open(res_full.value, "rb"), Path(res_full.value).name
+
+            if clicks > 0:
+                res_full = write_full_video.use_thread(
+                    time_dict.value,
+                    disabled.value,
+                    Path(file_name).stem,
+                    str(time_dict),
                 )
+                if res_full.state == solara.ResultState.RUNNING:
+                    Progress("Building Full Clip...")
+                elif res_full.state == solara.ResultState.FINISHED:
+                    solara.FileDownload(
+                        lambda: open(res_full.value, "rb"), Path(res_full.value).name
+                    )
 
 
 @solara.component
