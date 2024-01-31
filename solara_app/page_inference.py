@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 import polars as pl
 import solara
@@ -22,13 +23,17 @@ def DfSelectComponent(df: pl.DataFrame, file: str):
     disabled = solara.use_reactive({})
     selected_vid, set_selected_vid = solara.use_state(0)
     cut_off = solara.use_reactive(5)
+    start_stop: solara.Reactive[list[datetime.datetime]] = solara.use_reactive([df["timestamp"].min(), df["timestamp"].max()])  # type: ignore
     clicks, set_clicks = solara.use_state(0)
 
     with solara.Card(
         "Highlight Selection & Editing",
         "Select highlight threshold, remove or expand clips",
     ):
-        sol_utils.CutOffChartSelection(cut_off, df)
+        sol_utils.CutOffChartSelection(cut_off, start_stop, df)
+        df = df.filter(
+            pl.col("timestamp").is_between(start_stop.value[0], start_stop.value[1])
+        )
 
         time_df = time_slice.create_start_end_time(
             df, cut_off.value, extend_forward.value, extend_backward.value

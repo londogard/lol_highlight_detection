@@ -1,9 +1,10 @@
-from typing import Callable
+import datetime
+from typing import Any, Callable
 from solara.components.file_drop import FileInfo
 import solara
 import polars as pl
 import plotly.express as px
-
+from dateutil import parser
 from solara_app.folders import CHECKPOINTS, CONVERTED
 
 
@@ -46,8 +47,11 @@ def ModelFileSelectComponent(
 
 
 @solara.component
-def CutOffChartSelection(cut_off: solara.Reactive[float], df: pl.DataFrame):
-    x_axis = solara.reactive([df["timestamp"].min(), df["timestamp"].max()])
+def CutOffChartSelection(
+    cut_off: solara.Reactive[int],
+    start_stop: solara.Reactive[list[datetime.datetime]],
+    df: pl.DataFrame,
+):
     div = solara.Column()
 
     solara.SliderInt(
@@ -60,27 +64,23 @@ def CutOffChartSelection(cut_off: solara.Reactive[float], df: pl.DataFrame):
     )
     with div:
         fig = px.line(
-            df, x="timestamp", y="preds", line_shape="hv", range_x=x_axis.value
+            df, x="timestamp", y="preds", line_shape="hv", range_x=start_stop.value
         )
         fig.add_hline(y=cut_off.value, line_color="red")
 
-        def update_vals(dict):
-            from dateutil import parser
-
-            if dict is not None:
-                print(dict)
-                layout = dict["relayout_data"]
+        def update_vals(relayout_dict: dict[str, Any] | None):
+            if relayout_dict is not None:
+                layout = relayout_dict["relayout_data"]
                 if "xaxis.range[0]" in layout:
-                    x_axis.value = [
-                        parser.parse(
-                            dict["relayout_data"]["xaxis.range[0]"], ignoretz=True
-                        ),
-                        parser.parse(
-                            dict["relayout_data"]["xaxis.range[1]"], ignoretz=True
-                        ),
+                    start_stop.value = [
+                        parser.parse(layout["xaxis.range[0]"], ignoretz=True),
+                        parser.parse(layout["xaxis.range[1]"], ignoretz=True),
                     ]
                 else:
-                    print(x_axis.value)
+                    xaxis_range = layout["xaxis.range"]
+                    start_stop.value = [
+                        parser.parse(xaxis_range[0], ignoretz=True),
+                        parser.parse(xaxis_range[1], ignoretz=True),
+                    ]
 
-        print(x_axis.value)
         solara.FigurePlotly(fig, on_relayout=update_vals)
