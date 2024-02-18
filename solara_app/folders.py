@@ -1,11 +1,11 @@
 from pathlib import Path
 
 
-TMP = Path("tmp")
-OUT = Path("out")
-DOWNLOADED = Path("downloaded")
-CONVERTED = Path("converted")
-CHECKPOINTS = Path("ckpts")
+TMP = Path("tmp").absolute()
+OUT = Path("out").absolute()
+DOWNLOADED = Path("downloaded").absolute()
+CONVERTED = Path("converted").absolute()
+CHECKPOINTS = Path("ckpts").absolute()
 _ALL_PATHS = [TMP, OUT, DOWNLOADED, CONVERTED, CHECKPOINTS]
 
 

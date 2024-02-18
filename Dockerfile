@@ -1,16 +1,16 @@
 FROM mcr.microsoft.com/vscode/devcontainers/miniconda:latest
 
-COPY env.yml .
+USER vscode
+
+COPY --chown=vscode . /app
+WORKDIR /app
+
 RUN conda env create -f env.yml
 RUN conda clean -a -y
+RUN conda init
 
 EXPOSE 8765
 
-COPY . /app
-WORKDIR /app
+ENV PATH /opt/conda/envs/highlights/bin/:$PATH
 
-RUN conda init
-RUN echo "source activate highlights" > ~/.bashrc
-ENV PATH /opt/conda/envs/highlights/bin:$PATH
-
-CMD solara run sol_app.py --host=0.0.0.0
+CMD ["solara", "run", "sol_app.py", "--host=0.0.0.0"]
