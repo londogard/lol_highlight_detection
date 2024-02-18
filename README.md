@@ -1,3 +1,11 @@
+---
+title: lol_highlight_detection
+emoji: 🐳
+sdk: docker
+app_port: 8765
+pinned: false
+---
+
 # lol_highlight_detection
 League of Legend Highlight Detection
 

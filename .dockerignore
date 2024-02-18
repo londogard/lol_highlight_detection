@@ -6,4 +6,4 @@ tmp/
 highlights/
 out/
 Dockerfile
-env.yml
+# env.yml
