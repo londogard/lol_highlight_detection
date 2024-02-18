@@ -2,8 +2,8 @@ from pathlib import Path
 import solara
 
 import r2
-
 from solara_app.folders import CHECKPOINTS
+
 from solara_app.mini_components.simple import Progress
 
 
@@ -13,7 +13,9 @@ def DownloadModels():
     selected_models: solara.Reactive[list[str]] = solara.use_reactive([])
 
     if models.state == solara.ResultState.FINISHED:
-        unavailable_models = [m for m in (models.value or []) if not Path(m).exists()]
+        unavailable_models: list[str] = [
+            m for m in (models.value or []) if not Path(m).exists()
+        ]
         solara.SelectMultiple(
             "Select model(s) to download",
             selected_models,

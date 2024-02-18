@@ -23,7 +23,9 @@ def DfSelectComponent(df: pl.DataFrame, file: str):
     disabled = solara.use_reactive({})
     selected_vid, set_selected_vid = solara.use_state(0)
     cut_off = solara.use_reactive(5)
-    start_stop: solara.Reactive[list[datetime.datetime]] = solara.use_reactive([df["timestamp"].min(), df["timestamp"].max()])  # type: ignore
+    start_stop: solara.Reactive[list[datetime.datetime]] = solara.use_reactive(
+        [df["timestamp"].min(), df["timestamp"].max()]
+    )  # type: ignore
     clicks, set_clicks = solara.use_state(0)
 
     with solara.Card(
@@ -95,9 +97,11 @@ def DfSelectComponent(df: pl.DataFrame, file: str):
                     )
 
                 solara.Button(
-                    "✅ Add Video"
-                    if disabled.value.get(selected_vid)
-                    else "❌ Remove Video",
+                    (
+                        "✅ Add Video"
+                        if disabled.value.get(selected_vid)
+                        else "❌ Remove Video"
+                    ),
                     on_click=disable_vid(selected_vid),
                     style={"width": "25%"},
                 )
@@ -134,7 +138,7 @@ def ShowDfComponent(model: str, file: str):
 
     if df.state == solara.ResultState.RUNNING:
         Progress("Running...")
-    elif df.state == solara.ResultState.FINISHED:
+    elif df.state == solara.ResultState.FINISHED and df.value is not None:
         DfSelectComponent(df.value, file)
 
 
